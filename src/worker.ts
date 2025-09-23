@@ -10,7 +10,7 @@ interface ContactRequest {
 }
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*', // Trong production, thay * bằng domain cụ thể
+  'Access-Control-Allow-Origin': 'https://hilu-page.pages.dev',
   'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };

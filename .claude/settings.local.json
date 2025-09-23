@@ -14,7 +14,12 @@
       "Bash(npm run typecheck:*)",
       "Bash(npx tsc:*)",
       "Bash(tree:*)",
-      "Bash(npx wrangler d1 execute:*)"
+      "Bash(npx wrangler d1 execute:*)",
+      "Bash(npm run:*)",
+      "Bash(curl:*)",
+      "Bash(npx wrangler deploy:*)",
+      "Bash(npx wrangler workers:*)",
+      "Bash(npx wrangler deployments:*)"
     ],
     "deny": [],
     "ask": []

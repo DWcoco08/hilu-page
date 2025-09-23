@@ -50,7 +50,7 @@ export function Contact() {
     if (validateForm()) {
       try {
         // Worker URL
-        const workerUrl = 'https://hilu-website.dnduchuy08.workers.dev';
+        const workerUrl = 'https://hilu-website.btt7m8gzm7.workers.dev';
 
         const response = await fetch(`${workerUrl}/api/contact`, {
           method: 'POST',
