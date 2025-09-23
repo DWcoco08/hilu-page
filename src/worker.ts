@@ -9,15 +9,39 @@ interface ContactRequest {
   message?: string;
 }
 
-const corsHeaders = {
-  'Access-Control-Allow-Origin': 'https://hilu-page.pages.dev',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type',
-};
+// Danh sách domains được phép
+const allowedOrigins = [
+  'https://hilutech.com',
+  'https://www.hilutech.com',
+  'https://hilu-page.pages.dev',
+  'http://localhost:5173',
+  'http://localhost:3000'
+];
+
+function getCorsHeaders(request: Request) {
+  const origin = request.headers.get('Origin') || '';
+
+  // Kiểm tra origin có trong danh sách không
+  if (allowedOrigins.includes(origin)) {
+    return {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    };
+  }
+
+  // Default fallback
+  return {
+    'Access-Control-Allow-Origin': 'https://hilutech.com',
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type',
+  };
+}
 
 export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
+    const corsHeaders = getCorsHeaders(request);
 
     // Handle CORS preflight
     if (request.method === 'OPTIONS') {
