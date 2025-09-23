@@ -2,6 +2,9 @@ name = "hilu-website"
 main = "src/worker.ts"
 compatibility_date = "2024-01-01"
 
+[vars]
+TURNSTILE_SECRET_KEY = "0x4AAAAAAB20YlIkyncOnmGk6L_hmjPgt8s"
+
 [[d1_databases]]
 binding = "hilu_db"
 database_name = "hilu-db"

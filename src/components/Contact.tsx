@@ -1,10 +1,16 @@
 import { motion } from "motion/react";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Textarea } from "./ui/textarea";
 import { toast } from "sonner@2.0.3";
 import { useMobileDetect } from "../hooks/useMobileDetect";
+
+declare global {
+  interface Window {
+    turnstile: any;
+  }
+}
 
 export function Contact() {
   const isMobile = useMobileDetect();
@@ -17,6 +23,27 @@ export function Contact() {
     name: false,
     email: false
   });
+  const [turnstileToken, setTurnstileToken] = useState<string>("");
+  const turnstileRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    // Load Turnstile widget
+    if (window.turnstile && turnstileRef.current) {
+      window.turnstile.render(turnstileRef.current, {
+        sitekey: '0x4AAAAAAB20YkbQa1D11qIz',
+        callback: (token: string) => {
+          setTurnstileToken(token);
+        },
+        'error-callback': () => {
+          toast.error("Captcha verification failed. Please refresh and try again.");
+          setTurnstileToken("");
+        },
+        'expired-callback': () => {
+          setTurnstileToken("");
+        }
+      });
+    }
+  }, []);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -47,6 +74,11 @@ export function Contact() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!turnstileToken) {
+      toast.error("Please complete the captcha verification");
+      return;
+    }
+
     if (validateForm()) {
       try {
         // Worker URL
@@ -57,7 +89,10 @@ export function Contact() {
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify(formData),
+          body: JSON.stringify({
+            ...formData,
+            turnstileToken
+          }),
         });
 
         const result = await response.json();
@@ -188,6 +223,10 @@ export function Contact() {
                     rows={5}
                     className="w-full border-gray-200 focus:border-[#125EF1] focus:ring-[#125EF1] transition-colors duration-300 resize-none bg-white"
                   />
+                </div>
+
+                <div className="flex justify-center">
+                  <div ref={turnstileRef}></div>
                 </div>
 
                 <Button
@@ -390,6 +429,16 @@ export function Contact() {
                   rows={5}
                   className="w-full border-gray-200 focus:border-[#125EF1] focus:ring-[#125EF1] transition-colors duration-300 resize-none bg-white"
                 />
+              </motion.div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.2, delay: 0.33 }}
+                className="flex justify-center"
+              >
+                <div ref={turnstileRef}></div>
               </motion.div>
 
               <motion.div

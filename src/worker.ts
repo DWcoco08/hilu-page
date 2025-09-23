@@ -1,12 +1,19 @@
 export interface Env {
   hilu_db: D1Database;  // Tên PHẢI khớp với binding trong wrangler.toml (đã sửa thành hilu_db)
   ENVIRONMENT: string;
+  TURNSTILE_SECRET_KEY: string;  // Secret key cho Turnstile
 }
 
 interface ContactRequest {
   name: string;
   email: string;
   message?: string;
+  turnstileToken: string;
+}
+
+interface TurnstileResponse {
+  success: boolean;
+  'error-codes'?: string[];
 }
 
 // Danh sách domains được phép
@@ -57,6 +64,43 @@ export default {
         if (!body.name || !body.email) {
           return new Response(
             JSON.stringify({ error: 'Name and email are required' }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+
+        // Verify Turnstile token
+        if (!body.turnstileToken) {
+          return new Response(
+            JSON.stringify({ error: 'Captcha verification required' }),
+            {
+              status: 400,
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+            }
+          );
+        }
+
+        // Verify token with Cloudflare
+        const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            secret: env.TURNSTILE_SECRET_KEY || '0x4AAAAAAB20YlIkyncOnmGk6L_hmjPgt8s',
+            response: body.turnstileToken,
+            remoteip: request.headers.get('CF-Connecting-IP') || undefined,
+          }),
+        });
+
+        const turnstileData: TurnstileResponse = await turnstileResponse.json();
+
+        if (!turnstileData.success) {
+          console.error('Turnstile verification failed:', turnstileData['error-codes']);
+          return new Response(
+            JSON.stringify({ error: 'Captcha verification failed' }),
             {
               status: 400,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }
