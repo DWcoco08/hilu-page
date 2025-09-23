@@ -56,9 +56,9 @@
       "scripts": {
             "dev": "vite",
             "build": "vite build",
-            "db:create": "wrangler d1 create hilu-contacts-new",
-            "db:migrate": "wrangler d1 execute hilu-contacts-new --local --file=./schema.sql",
-            "db:migrate:remote": "wrangler d1 execute hilu-contacts-new --remote --file=./schema.sql",
+            "db:create": "wrangler d1 create hilu-db",
+            "db:migrate": "wrangler d1 execute hilu-db --local --file=./schema.sql",
+            "db:migrate:remote": "wrangler d1 execute hilu-db --remote --file=./schema.sql",
             "worker:dev": "wrangler dev",
             "worker:deploy": "wrangler deploy"
       }

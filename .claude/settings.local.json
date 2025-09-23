@@ -13,7 +13,8 @@
       "Bash(npm run lint)",
       "Bash(npm run typecheck:*)",
       "Bash(npx tsc:*)",
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(npx wrangler d1 execute:*)"
     ],
     "deny": [],
     "ask": []
