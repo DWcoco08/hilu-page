@@ -280,15 +280,6 @@ export function Contact() {
                   />
                 </div>
 
-                <div className="flex justify-center">
-                  <div ref={turnstileRef} className="min-h-[65px]"></div>
-                  {!turnstileLoaded && (
-                    <div className="text-gray-500 text-sm">
-                      Loading captcha...
-                    </div>
-                  )}
-                </div>
-
                 <Button
                   type="submit"
                   className="w-full bg-[#125EF1] hover:bg-[#0e4dc4] text-white py-4 rounded-lg transition-all duration-300"
