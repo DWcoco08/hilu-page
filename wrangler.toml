@@ -12,18 +12,19 @@ database_id = "8a24b4a3-a703-43ef-a378-993019cfb93f"
 
 # Cron Triggers - Tự động chạy theo lịch
 [triggers]
-# Test: Chạy mỗi 2 phút
-crons = ["*/2 * * * *"]
+# Production: Chạy mỗi ngày lúc 7h sáng (giờ Việt Nam)
+# 7h sáng VN (UTC+7) = 0h UTC
+crons = ["0 0 * * *"]
 
-# Production options (uncomment cái nào bạn muốn dùng):
+# Các tùy chọn khác (uncomment để dùng):
+# Test mỗi 2 phút:
+# crons = ["*/2 * * * *"]
+
 # Chạy mỗi giờ:
 # crons = ["0 * * * *"]
 
-# Chạy mỗi ngày lúc 9h sáng (UTC+7 = 2h UTC):
-# crons = ["0 2 * * *"]
+# Chạy mỗi tuần vào thứ 2, 7h sáng VN:
+# crons = ["0 0 * * MON"]
 
-# Chạy mỗi tuần vào thứ 2, 9h sáng:
-# crons = ["0 2 * * MON"]
-
-# Chạy 3 lần/ngày (8h, 12h, 18h):
-# crons = ["0 1 * * *", "0 5 * * *", "0 11 * * *"]
+# Chạy 2 lần/ngày (7h sáng và 7h tối VN):
+# crons = ["0 0 * * *", "0 12 * * *"]

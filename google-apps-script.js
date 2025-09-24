@@ -1,13 +1,16 @@
 /**
- * Google Apps Script để sync data từ Cloudflare Worker (hilu.workers.dev) vào Google Sheet
+ * Google Apps Script để sync data từ Cloudflare Worker vào Google Sheet
  *
- * Hướng dẫn sử dụng:
+ * HƯỚNG DẪN SỬ DỤNG:
  * 1. Mở Google Sheet mới hoặc có sẵn
  * 2. Vào Extensions > Apps Script
  * 3. Copy toàn bộ code này vào Apps Script editor
  * 4. Lưu file (Ctrl+S hoặc Cmd+S)
  * 5. Chạy hàm syncContactsFromWorker() để sync data
- * 6. (Optional) Tạo trigger tự động: Vào Triggers > Add Trigger > chọn syncContactsFromWorker
+ *
+ * AUTO SYNC MẶC ĐỊNH: 7h sáng mỗi ngày
+ * - Dùng menu "📅 Setup Auto Sync (mỗi ngày)" để kích hoạt
+ * - Hoặc setup tự động khi chạy lần đầu
  */
 
 // URL của Cloudflare Worker endpoint
@@ -194,20 +197,20 @@ function setupHourlyTrigger() {
 }
 
 /**
- * Setup trigger tự động sync mỗi ngày
+ * Setup trigger tự động sync mỗi ngày (MẶC ĐỊNH: 7h sáng)
  */
 function setupDailyTrigger() {
   // Xóa triggers cũ
   deleteTriggers();
 
-  // Tạo trigger mới - chạy lúc 9h sáng mỗi ngày
+  // Tạo trigger mới - chạy lúc 7h sáng mỗi ngày (giờ Việt Nam)
   ScriptApp.newTrigger("syncContactsFromWorker")
     .timeBased()
-    .atHour(9)
+    .atHour(7)
     .everyDays(1)
     .create();
 
-  SpreadsheetApp.getUi().alert("✅ Đã setup auto sync mỗi ngày lúc 9h sáng!");
+  SpreadsheetApp.getUi().alert("✅ Đã setup auto sync mỗi ngày lúc 7h sáng!");
 }
 
 /**
@@ -217,14 +220,14 @@ function setupWeeklyTrigger() {
   // Xóa triggers cũ
   deleteTriggers();
 
-  // Tạo trigger mới - chạy vào thứ 2 hàng tuần lúc 9h sáng
+  // Tạo trigger mới - chạy vào thứ 2 hàng tuần lúc 7h sáng
   ScriptApp.newTrigger("syncContactsFromWorker")
     .timeBased()
     .onWeekDay(ScriptApp.WeekDay.MONDAY)
-    .atHour(9)
+    .atHour(7)
     .create();
 
-  SpreadsheetApp.getUi().alert("✅ Đã setup auto sync mỗi thứ 2 lúc 9h sáng!");
+  SpreadsheetApp.getUi().alert("✅ Đã setup auto sync mỗi thứ 2 lúc 7h sáng!");
 }
 
 /**
