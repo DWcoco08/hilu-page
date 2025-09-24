@@ -45,7 +45,68 @@ function getCorsHeaders(request: Request) {
   };
 }
 
+// Interface cho scheduled response
+interface ScheduledController {
+  scheduledTime: number;
+  cron: string;
+  noRetry(): void;
+}
+
 export default {
+  // Scheduled handler - chạy theo cron schedule
+  async scheduled(controller: ScheduledController, env: Env, ctx: ExecutionContext): Promise<void> {
+    console.log(`Cron job executed at ${new Date(controller.scheduledTime).toISOString()}`);
+    console.log(`Cron expression: ${controller.cron}`);
+
+    try {
+      // Lấy tất cả contacts từ database
+      const { results } = await env.hilu_db.prepare(
+        `SELECT COUNT(*) as total FROM contacts`
+      ).first();
+
+      const totalContacts = results?.total || 0;
+      console.log(`Total contacts in database: ${totalContacts}`);
+
+      // Lấy contacts mới trong 24h qua
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { results: newContacts } = await env.hilu_db.prepare(
+        `SELECT * FROM contacts WHERE created_at > ? ORDER BY created_at DESC`
+      ).bind(oneDayAgo).all();
+
+      console.log(`New contacts in last 24 hours: ${newContacts.length}`);
+
+      // Log chi tiết contacts mới (nếu có)
+      if (newContacts.length > 0) {
+        console.log('Recent contacts:');
+        newContacts.forEach((contact: any) => {
+          console.log(`- ${contact.name} (${contact.email}) at ${contact.created_at}`);
+        });
+      }
+
+      // Có thể thêm logic gửi email, webhook, hoặc sync sang Google Sheet tự động
+      // Ví dụ: Gửi webhook sang Slack, Discord, hoặc Make/Zapier
+
+      // Optional: Lưu log vào database
+      await env.hilu_db.prepare(
+        `INSERT INTO cron_logs (executed_at, total_contacts, new_contacts_24h, status)
+         VALUES (?, ?, ?, ?)`
+      ).bind(
+        new Date(controller.scheduledTime).toISOString(),
+        totalContacts,
+        newContacts.length,
+        'success'
+      ).run().catch(() => {
+        // Bỏ qua nếu table cron_logs chưa tồn tại
+        console.log('Note: cron_logs table does not exist yet');
+      });
+
+    } catch (error) {
+      console.error('Error in scheduled job:', error);
+      // Không retry nếu có lỗi
+      controller.noRetry();
+    }
+  },
+
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     const url = new URL(request.url);
     const corsHeaders = getCorsHeaders(request);

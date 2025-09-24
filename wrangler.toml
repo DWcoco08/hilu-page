@@ -9,3 +9,21 @@ TURNSTILE_SECRET_KEY = "0x4AAAAAAB2-jIIkTD7xWkHe3Hb3Cf4CQqE"
 binding = "hilu_db"
 database_name = "hilu-db"
 database_id = "8a24b4a3-a703-43ef-a378-993019cfb93f"
+
+# Cron Triggers - Tự động chạy theo lịch
+[triggers]
+# Test: Chạy mỗi 2 phút
+crons = ["*/2 * * * *"]
+
+# Production options (uncomment cái nào bạn muốn dùng):
+# Chạy mỗi giờ:
+# crons = ["0 * * * *"]
+
+# Chạy mỗi ngày lúc 9h sáng (UTC+7 = 2h UTC):
+# crons = ["0 2 * * *"]
+
+# Chạy mỗi tuần vào thứ 2, 9h sáng:
+# crons = ["0 2 * * MON"]
+
+# Chạy 3 lần/ngày (8h, 12h, 18h):
+# crons = ["0 1 * * *", "0 5 * * *", "0 11 * * *"]
