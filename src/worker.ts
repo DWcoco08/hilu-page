@@ -183,6 +183,108 @@ export default {
       }
     }
 
+    // GET /data/json - Lấy data từ contacts để export sang Google Sheet
+    if (url.pathname === '/data/json' && request.method === 'GET') {
+      try {
+        const { results } = await env.hilu_db.prepare(
+          `SELECT id, name, email, message, created_at, ip_address, user_agent
+           FROM contacts
+           ORDER BY created_at DESC`
+        ).all();
+
+        return new Response(
+          JSON.stringify({
+            success: true,
+            data: results,
+            count: results.length,
+            timestamp: new Date().toISOString()
+          }),
+          {
+            status: 200,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      } catch (error) {
+        console.error('Error fetching contacts data:', error);
+        return new Response(
+          JSON.stringify({ error: 'Failed to fetch data' }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          }
+        );
+      }
+    }
+
+    // GET /data/html - Debug view dạng HTML table
+    if (url.pathname === '/data/html' && request.method === 'GET') {
+      try {
+        const { results } = await env.hilu_db.prepare(
+          `SELECT id, name, email, message, created_at, ip_address, user_agent
+           FROM contacts
+           ORDER BY created_at DESC`
+        ).all();
+
+        const html = `
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Contacts Data</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #4CAF50; color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+        h1 { color: #333; }
+        .stats { margin-bottom: 20px; padding: 10px; background: #e3f2fd; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Contacts Database</h1>
+    <div class="stats">
+        <strong>Total Records:</strong> ${results.length} |
+        <strong>Last Updated:</strong> ${new Date().toISOString()}
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Message</th>
+                <th>Created At</th>
+                <th>IP Address</th>
+                <th>User Agent</th>
+            </tr>
+        </thead>
+        <tbody>
+            ${results.map((row: any) => `
+            <tr>
+                <td>${row.id}</td>
+                <td>${row.name}</td>
+                <td>${row.email}</td>
+                <td>${row.message || '-'}</td>
+                <td>${row.created_at}</td>
+                <td>${row.ip_address || '-'}</td>
+                <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis;">${row.user_agent || '-'}</td>
+            </tr>
+            `).join('')}
+        </tbody>
+    </table>
+</body>
+</html>`;
+
+        return new Response(html, {
+          status: 200,
+          headers: { 'Content-Type': 'text/html; charset=utf-8' }
+        });
+      } catch (error) {
+        console.error('Error generating HTML view:', error);
+        return new Response('Error loading data', { status: 500 });
+      }
+    }
+
     // GET /api/health - Health check
     if (url.pathname === '/api/health' && request.method === 'GET') {
       return new Response(
