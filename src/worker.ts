@@ -83,24 +83,33 @@ export default {
         }
 
         // Verify token with Cloudflare
+        const secretKey = env.TURNSTILE_SECRET_KEY || '0x4AAAAAAB2-jIIkTD7xWkHe3Hb3Cf4CQqE';
+        console.log('Using secret key:', secretKey.substring(0, 10) + '...');
+        console.log('Received token:', body.turnstileToken?.substring(0, 20) + '...');
+
+        const verifyBody = {
+          secret: secretKey,
+          response: body.turnstileToken,
+        };
+
         const turnstileResponse = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
-          body: JSON.stringify({
-            secret: env.TURNSTILE_SECRET_KEY || '0x4AAAAAAB2-jIIkTD7xWkHe3Hb3Cf4CQqE',
-            response: body.turnstileToken,
-            remoteip: request.headers.get('CF-Connecting-IP') || undefined,
-          }),
+          body: JSON.stringify(verifyBody),
         });
 
         const turnstileData: TurnstileResponse = await turnstileResponse.json();
+        console.log('Turnstile verification result:', turnstileData);
 
         if (!turnstileData.success) {
           console.error('Turnstile verification failed:', turnstileData['error-codes']);
           return new Response(
-            JSON.stringify({ error: 'Captcha verification failed' }),
+            JSON.stringify({
+              error: 'Captcha verification failed',
+              details: turnstileData['error-codes']
+            }),
             {
               status: 400,
               headers: { ...corsHeaders, 'Content-Type': 'application/json' }

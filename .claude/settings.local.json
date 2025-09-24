@@ -19,7 +19,12 @@
       "Bash(curl:*)",
       "Bash(npx wrangler deploy:*)",
       "Bash(npx wrangler workers:*)",
-      "Bash(npx wrangler deployments:*)"
+      "Bash(npx wrangler deployments:*)",
+      "Bash(npx wrangler tail:*)",
+      "Bash(npx wrangler secrets put:*)",
+      "Bash(npx wrangler secret put:*)",
+      "Bash(npx wrangler secret delete:*)",
+      "Bash(npx wrangler secret:*)"
     ],
     "deny": [],
     "ask": []

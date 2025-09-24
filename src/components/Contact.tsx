@@ -111,6 +111,9 @@ export function Contact() {
         // Worker URL
         const workerUrl = 'https://hilu-website.btt7m8gzm7.workers.dev';
 
+        console.log('Sending token:', turnstileToken);
+        console.log('Sending data:', { ...formData, turnstileToken });
+
         const response = await fetch(`${workerUrl}/api/contact`, {
           method: 'POST',
           headers: {
@@ -128,8 +131,18 @@ export function Contact() {
           toast.success("Message sent successfully! We'll get back to you within 24 hours.");
           // Reset form
           setFormData({ name: "", email: "", message: "" });
+          // Reset turnstile
+          setTurnstileToken("");
+          if (window.turnstile) {
+            window.turnstile.reset();
+          }
         } else {
+          console.error('Error details:', result);
           toast.error(result.error || "Failed to send message. Please try again.");
+          // Reset turnstile on error
+          if (window.turnstile) {
+            window.turnstile.reset();
+          }
         }
       } catch (error) {
         console.error('Submit error:', error);
