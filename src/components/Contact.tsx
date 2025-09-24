@@ -17,11 +17,11 @@ export function Contact() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    message: ""
+    message: "",
   });
   const [errors, setErrors] = useState({
     name: false,
-    email: false
+    email: false,
   });
   const [turnstileToken, setTurnstileToken] = useState<string>("");
   const turnstileRef = useRef<HTMLDivElement>(null);
@@ -30,38 +30,44 @@ export function Contact() {
   useEffect(() => {
     // Wait for Turnstile script to load
     const checkTurnstile = setInterval(() => {
-      if (window.turnstile && turnstileRef.current && !turnstileRef.current.hasChildNodes()) {
+      if (
+        window.turnstile &&
+        turnstileRef.current &&
+        !turnstileRef.current.hasChildNodes()
+      ) {
         clearInterval(checkTurnstile);
 
         // Clear any existing widget first
-        turnstileRef.current.innerHTML = '';
+        turnstileRef.current.innerHTML = "";
 
         // Render Turnstile widget
         try {
           window.turnstile.render(turnstileRef.current, {
-            sitekey: '0x4AAAAAAB2-jGhuuTcawquT',
+            sitekey: "0x4AAAAAAB2-jGhuuTcawquT",
             callback: (token: string) => {
-              console.log('Turnstile token received');
+              console.log("Turnstile token received");
               setTurnstileToken(token);
               setTurnstileLoaded(true);
             },
-            'error-callback': () => {
-              console.error('Turnstile error');
-              toast.error("Captcha verification failed. Please refresh and try again.");
+            "error-callback": () => {
+              console.error("Turnstile error");
+              toast.error(
+                "Captcha verification failed. Please refresh and try again."
+              );
               setTurnstileToken("");
               setTurnstileLoaded(false);
             },
-            'expired-callback': () => {
-              console.log('Turnstile token expired');
+            "expired-callback": () => {
+              console.log("Turnstile token expired");
               setTurnstileToken("");
               setTurnstileLoaded(false);
             },
-            theme: 'light',
-            size: 'normal'
+            theme: "light",
+            size: "normal",
           });
-          console.log('Turnstile widget rendered');
+          console.log("Turnstile widget rendered");
         } catch (error) {
-          console.error('Error rendering Turnstile:', error);
+          console.error("Error rendering Turnstile:", error);
         }
       }
     }, 100);
@@ -73,17 +79,17 @@ export function Contact() {
   }, []);
 
   const handleInputChange = (field: string, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
     // Clear error when user starts typing
     if (errors[field as keyof typeof errors]) {
-      setErrors(prev => ({ ...prev, [field]: false }));
+      setErrors((prev) => ({ ...prev, [field]: false }));
     }
   };
 
   const validateForm = () => {
     const newErrors = {
       name: formData.name.trim() === "",
-      email: formData.email.trim() === ""
+      email: formData.email.trim() === "",
     };
 
     setErrors(newErrors);
@@ -109,26 +115,28 @@ export function Contact() {
     if (validateForm()) {
       try {
         // Worker URL
-        const workerUrl = 'https://hilu-website.btt7m8gzm7.workers.dev';
+        const workerUrl = "https://hilu-website.btt7m8gzm7.workers.dev";
 
-        console.log('Sending token:', turnstileToken);
-        console.log('Sending data:', { ...formData, turnstileToken });
+        console.log("Sending token:", turnstileToken);
+        console.log("Sending data:", { ...formData, turnstileToken });
 
         const response = await fetch(`${workerUrl}/api/contact`, {
-          method: 'POST',
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
           body: JSON.stringify({
             ...formData,
-            turnstileToken
+            turnstileToken,
           }),
         });
 
         const result = await response.json();
 
         if (response.ok) {
-          toast.success("Message sent successfully! We'll get back to you within 24 hours.");
+          toast.success(
+            "Message sent successfully! We'll get back to you within 24 hours."
+          );
           // Reset form
           setFormData({ name: "", email: "", message: "" });
           // Reset turnstile
@@ -137,16 +145,20 @@ export function Contact() {
             window.turnstile.reset();
           }
         } else {
-          console.error('Error details:', result);
-          toast.error(result.error || "Failed to send message. Please try again.");
+          console.error("Error details:", result);
+          toast.error(
+            result.error || "Failed to send message. Please try again."
+          );
           // Reset turnstile on error
           if (window.turnstile) {
             window.turnstile.reset();
           }
         }
       } catch (error) {
-        console.error('Submit error:', error);
-        toast.error("Network error. Please check your connection and try again.");
+        console.error("Submit error:", error);
+        toast.error(
+          "Network error. Please check your connection and try again."
+        );
       }
     }
   };
@@ -155,18 +167,18 @@ export function Contact() {
     {
       title: "Email",
       info: "elie@ctld.life",
-      action: "mailto:elie@ctld.life"
+      action: "mailto:elie@ctld.life",
     },
     {
       title: "Telegram",
       info: "@elieting",
-      action: "https://t.me/elieting"
+      action: "https://t.me/elieting",
     },
     {
       title: "Schedule Call",
       info: "Book a meeting",
-      action: "https://calendly.com/hilu"
-    }
+      action: "https://calendly.com/hilu",
+    },
   ];
 
   // Mobile version - simplified without animations
@@ -178,16 +190,16 @@ export function Contact() {
           <div className="text-center mb-16">
             <h2 className="text-4xl lg:text-5xl text-gray-900 mb-8 leading-tight">
               Don't let your big idea wait — <br />
-              <span className="text-[#125EF1]">let us help you build it right.</span>
+              <span className="text-[#125EF1]">
+                let us help you build it right.
+              </span>
             </h2>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16">
             {/* Quick Contact Section */}
             <div className="space-y-8">
-              <h3 className="text-2xl text-gray-900 mb-8">
-                Let's talk now
-              </h3>
+              <h3 className="text-2xl text-gray-900 mb-8">Let's talk now</h3>
 
               {quickContactMethods.map((method) => (
                 <a
@@ -214,7 +226,8 @@ export function Contact() {
                 Leave a message and we'll reach you
               </h3>
               <p className="text-gray-600 mb-8">
-                Tell us about your project and we'll get back to you within 24 hours.
+                Tell us about your project and we'll get back to you within 24
+                hours.
               </p>
 
               <form onSubmit={handleSubmit} className="space-y-6">
@@ -258,7 +271,9 @@ export function Contact() {
                   <Textarea
                     id="message"
                     value={formData.message}
-                    onChange={(e) => handleInputChange("message", e.target.value)}
+                    onChange={(e) =>
+                      handleInputChange("message", e.target.value)
+                    }
                     placeholder="Tell us about your project, timeline, and goals..."
                     rows={5}
                     className="w-full border-gray-200 focus:border-[#125EF1] focus:ring-[#125EF1] transition-colors duration-300 resize-none bg-white"
@@ -268,7 +283,9 @@ export function Contact() {
                 <div className="flex justify-center">
                   <div ref={turnstileRef} className="min-h-[65px]"></div>
                   {!turnstileLoaded && (
-                    <div className="text-gray-500 text-sm">Loading captcha...</div>
+                    <div className="text-gray-500 text-sm">
+                      Loading captcha...
+                    </div>
                   )}
                 </div>
 
@@ -285,10 +302,11 @@ export function Contact() {
           {/* Footer */}
           <div className="text-center mt-20 pt-12 border-t border-gray-200">
             <p className="text-gray-600 mb-4">
-              © 2024 Hilu. We make Hi-Logic, user-centric programs with intelligent systems.
+              © 2024 Hilu. We make Hi-Logic, user-centric programs with
+              intelligent systems.
             </p>
             <div className="flex justify-center space-x-6 text-sm text-gray-500">
-              {['Privacy Policy', 'Terms of Service', 'LinkedIn', 'GitHub'].map((link) => (
+              {["Privacy Policy", "Terms of Service"].map((link) => (
                 <a
                   key={link}
                   href="#"
@@ -324,7 +342,9 @@ export function Contact() {
             transition={{ duration: 0.4, delay: 0.1 }}
           >
             Don't let your big idea wait — <br />
-            <span className="text-[#125EF1]">let us help you build it right.</span>
+            <span className="text-[#125EF1]">
+              let us help you build it right.
+            </span>
           </motion.h2>
         </motion.div>
 
@@ -357,7 +377,7 @@ export function Contact() {
                 transition={{ duration: 0.3, delay: index * 0.05 + 0.15 }}
                 whileHover={{
                   x: 10,
-                  transition: { duration: 0.2 }
+                  transition: { duration: 0.2 },
                 }}
                 className="flex items-center space-x-6 p-6 bg-white/30 backdrop-blur-md border border-white/20 rounded-xl hover:bg-white/50 hover:shadow-lg transition-all duration-300 group cursor-pointer"
               >
@@ -402,7 +422,8 @@ export function Contact() {
               transition={{ duration: 0.3, delay: 0.15 }}
               className="text-gray-600 mb-8"
             >
-              Tell us about your project and we'll get back to you within 24 hours.
+              Tell us about your project and we'll get back to you within 24
+              hours.
             </motion.p>
 
             <form onSubmit={handleSubmit} className="space-y-6">
@@ -483,7 +504,9 @@ export function Contact() {
               >
                 <div ref={turnstileRef} className="min-h-[65px]"></div>
                 {!turnstileLoaded && (
-                  <div className="text-gray-500 text-sm">Loading captcha...</div>
+                  <div className="text-gray-500 text-sm">
+                    Loading captcha...
+                  </div>
                 )}
               </motion.div>
 
@@ -525,7 +548,8 @@ export function Contact() {
             whileHover={{ color: "#125EF1" }}
             transition={{ duration: 0.3 }}
           >
-            © 2024 Hilu. We make Hi-Logic, user-centric programs with intelligent systems.
+            © 2024 Hilu. We make Hi-Logic, user-centric programs with
+            intelligent systems.
           </motion.p>
           <motion.div
             className="flex justify-center space-x-6 text-sm text-gray-500"
@@ -534,17 +558,19 @@ export function Contact() {
             viewport={{ once: true }}
             transition={{ duration: 0.3, delay: 0.5 }}
           >
-            {['Privacy Policy', 'Terms of Service', 'LinkedIn', 'GitHub'].map((link, index) => (
-              <motion.a
-                key={link}
-                href="#"
-                whileHover={{ scale: 1.1, color: "#125EF1" }}
-                transition={{ duration: 0.2 }}
-                className="hover:text-[#125EF1] transition-colors duration-300"
-              >
-                {link}
-              </motion.a>
-            ))}
+            {["Privacy Policy", "Terms of Service", "LinkedIn", "GitHub"].map(
+              (link, index) => (
+                <motion.a
+                  key={link}
+                  href="#"
+                  whileHover={{ scale: 1.1, color: "#125EF1" }}
+                  transition={{ duration: 0.2 }}
+                  className="hover:text-[#125EF1] transition-colors duration-300"
+                >
+                  {link}
+                </motion.a>
+              )
+            )}
           </motion.div>
         </motion.div>
       </div>
