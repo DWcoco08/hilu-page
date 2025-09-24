@@ -3,7 +3,7 @@ main = "src/worker.ts"
 compatibility_date = "2024-01-01"
 
 [vars]
-TURNSTILE_SECRET_KEY = "0x4AAAAAAB20YlIkyncOnmGk6L_hmjPgt8s"
+TURNSTILE_SECRET_KEY = "0x4AAAAAAB2-jIIkTD7xWkHe3Hb3Cf4CQqE"
 
 [[d1_databases]]
 binding = "hilu_db"

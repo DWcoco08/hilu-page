@@ -25,24 +25,51 @@ export function Contact() {
   });
   const [turnstileToken, setTurnstileToken] = useState<string>("");
   const turnstileRef = useRef<HTMLDivElement>(null);
+  const [turnstileLoaded, setTurnstileLoaded] = useState(false);
 
   useEffect(() => {
-    // Load Turnstile widget
-    if (window.turnstile && turnstileRef.current) {
-      window.turnstile.render(turnstileRef.current, {
-        sitekey: '0x4AAAAAAB20YkbQa1D11qIz',
-        callback: (token: string) => {
-          setTurnstileToken(token);
-        },
-        'error-callback': () => {
-          toast.error("Captcha verification failed. Please refresh and try again.");
-          setTurnstileToken("");
-        },
-        'expired-callback': () => {
-          setTurnstileToken("");
+    // Wait for Turnstile script to load
+    const checkTurnstile = setInterval(() => {
+      if (window.turnstile && turnstileRef.current && !turnstileRef.current.hasChildNodes()) {
+        clearInterval(checkTurnstile);
+
+        // Clear any existing widget first
+        turnstileRef.current.innerHTML = '';
+
+        // Render Turnstile widget
+        try {
+          window.turnstile.render(turnstileRef.current, {
+            sitekey: '0x4AAAAAAB2-jGhuuTcawquT',
+            callback: (token: string) => {
+              console.log('Turnstile token received');
+              setTurnstileToken(token);
+              setTurnstileLoaded(true);
+            },
+            'error-callback': () => {
+              console.error('Turnstile error');
+              toast.error("Captcha verification failed. Please refresh and try again.");
+              setTurnstileToken("");
+              setTurnstileLoaded(false);
+            },
+            'expired-callback': () => {
+              console.log('Turnstile token expired');
+              setTurnstileToken("");
+              setTurnstileLoaded(false);
+            },
+            theme: 'light',
+            size: 'normal'
+          });
+          console.log('Turnstile widget rendered');
+        } catch (error) {
+          console.error('Error rendering Turnstile:', error);
         }
-      });
-    }
+      }
+    }, 100);
+
+    // Cleanup
+    return () => {
+      clearInterval(checkTurnstile);
+    };
   }, []);
 
   const handleInputChange = (field: string, value: string) => {
@@ -226,7 +253,10 @@ export function Contact() {
                 </div>
 
                 <div className="flex justify-center">
-                  <div ref={turnstileRef}></div>
+                  <div ref={turnstileRef} className="min-h-[65px]"></div>
+                  {!turnstileLoaded && (
+                    <div className="text-gray-500 text-sm">Loading captcha...</div>
+                  )}
                 </div>
 
                 <Button
@@ -438,7 +468,10 @@ export function Contact() {
                 transition={{ duration: 0.2, delay: 0.33 }}
                 className="flex justify-center"
               >
-                <div ref={turnstileRef}></div>
+                <div ref={turnstileRef} className="min-h-[65px]"></div>
+                {!turnstileLoaded && (
+                  <div className="text-gray-500 text-sm">Loading captcha...</div>
+                )}
               </motion.div>
 
               <motion.div

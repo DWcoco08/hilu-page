@@ -89,7 +89,7 @@ export default {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            secret: env.TURNSTILE_SECRET_KEY || '0x4AAAAAAB20YlIkyncOnmGk6L_hmjPgt8s',
+            secret: env.TURNSTILE_SECRET_KEY || '0x4AAAAAAB2-jIIkTD7xWkHe3Hb3Cf4CQqE',
             response: body.turnstileToken,
             remoteip: request.headers.get('CF-Connecting-IP') || undefined,
           }),
